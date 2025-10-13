@@ -1,0 +1,37 @@
+import { clerkPlugin } from "@clerk/fastify";
+import Fastify from "fastify"
+import { shouldBeUser } from "./middleware/authMiddleware";
+import { connectOrderDB } from "@repo/order-db";
+import { orderRoute } from "./routes/order";
+
+const fastify = Fastify();
+
+fastify.register(clerkPlugin);
+
+fastify.get('/health', (request, reply) =>{
+    return reply.status(200).send({
+        status: "ok",
+        uptime: process.uptime(),
+        timestamp: Date.now()
+    })
+})
+
+fastify.get('/test',{preHandler: shouldBeUser}, (request, reply) =>{
+    return reply.send({message: "Order service is authenticated", userId: request.userId})
+})
+
+fastify.register(orderRoute);
+
+const start = async () =>{
+    try{
+        await connectOrderDB();
+        await fastify.listen({port: 8002});
+        console.log("Order service is running on port 8002...")
+    }catch(err){
+        console.log(err);
+        fastify.log.error(err);
+        process.exit(1);
+    }
+}
+
+start();
