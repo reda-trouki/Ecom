@@ -17,10 +17,10 @@ export const createStripeProduct = async (item: StripeProductType) => {
     return error;
   }
 };
-export const createStripeProductPrice = async (productId: number) => {
+export const getStripeProductPrice = async (productId: number) => {
   try {
     const res = await stripe.prices.list({
-      product: String(productId),
+      product: productId.toString(),
     });
     return res.data[0]?.unit_amount;
   } catch (error) {

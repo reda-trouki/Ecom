@@ -1,0 +1,6 @@
+{
+    "name": "@repo/kafka",
+    "version": "0.0.0",
+    "main": "./src/index.ts",
+    
+}
