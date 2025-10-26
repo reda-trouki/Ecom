@@ -4,6 +4,8 @@ import { shouldBeUser } from "./middleware/authMiddleware";
 import productRouter from "./routes/product.route";
 import categoryRouter from "./routes/category.route";
 import { clerkMiddleware } from "@clerk/express";
+import { consumer, producer } from "./utils/kafka";
+import { runKafkaSubscreptions } from '../../payment-service/src/utils/subscreptions';
 
 const app = express();
 
@@ -40,6 +42,15 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-app.listen(8001, () => {
-  console.log("Product Service Is Running on port 8001");
-});
+const start = async () => {
+  try {
+    Promise.all([await producer.connect(), await consumer.connect()]);
+    app.listen(8001, () => {
+      console.log("Product Service Is Running on port 8001");
+    });
+  } catch (error) {
+    console.log(error);
+    process.exit(1);
+  }
+};
+start();

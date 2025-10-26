@@ -4,34 +4,34 @@ import { auth } from '@clerk/nextjs/server';
 const TestPage = async () => {
     const { getToken } = await auth();
     const token = await getToken();
-    console.log(token)
+    console.log("Token : " + token)
 
-    const resProduct = await fetch("http://localhost:8001/health", {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        }
-    });
-    const ProductData = resProduct.json();
+    // const resProduct = await fetch("http://localhost:8001/health", {
+    //     headers: {
+    //         Authorization: `Bearer ${token}`,
+    //     }
+    // });
+    // const ProductData = resProduct.json();
 
-    console.log(ProductData);
+    // console.log(ProductData);
 
-    const resOrder = await fetch("http://localhost:8002/health", {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        }
-    });
-    const OrderData = resOrder.json();
+    // const resOrder = await fetch("http://localhost:8002/health", {
+    //     headers: {
+    //         Authorization: `Bearer ${token}`,
+    //     }
+    // });
+    // const OrderData = resOrder.json();
 
-    console.log(OrderData);
+    // console.log(OrderData);
 
-    const resPayment = await fetch("http://localhost:8003/health", {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        }
-    });
-    const PaymentData = resPayment.json();
+    // const resPayment = await fetch("http://localhost:8003/health", {
+    //     headers: {
+    //         Authorization: `Bearer ${token}`,
+    //     }
+    // });
+    // const PaymentData = resPayment.json();
 
-    console.log(PaymentData);
+    // console.log(PaymentData);
 
 
     return (

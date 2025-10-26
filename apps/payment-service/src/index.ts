@@ -1,23 +1,28 @@
-import { clerkMiddleware } from '@hono/clerk-auth'
-import { serve } from '@hono/node-server'
-import { Hono } from 'hono'
-import sessionRoute from './routes/session.route.js';
-import { cors } from 'hono/cors';
-import webhookRoute from './routes/webhooks.route.js';
+import { clerkMiddleware } from "@hono/clerk-auth";
+import { serve } from "@hono/node-server";
+import { Hono } from "hono";
+import sessionRoute from "./routes/session.route.js";
+import { cors } from "hono/cors";
+import webhookRoute from "./routes/webhooks.route.js";
+import { consumer, producer } from "./utils/kafka.js";
+import { runKafkaSubscreptions } from "./utils/subscreptions.js";
 
-const app = new Hono()
+const app = new Hono();
 
-app.use('*', clerkMiddleware());
-app.use('*', cors({
-  origin: "http://localhost:3000"
-}))
+app.use("*", clerkMiddleware());
+app.use(
+  "*",
+  cors({
+    origin: "http://localhost:3000",
+  })
+);
 
-app.get('/health', (c) => {
+app.get("/health", (c) => {
   return c.json({
     staus: "ok",
     uptime: process.uptime(),
-    timestamp: Date.now()
-  })
+    timestamp: Date.now(),
+  });
 });
 
 app.route("/sessions", sessionRoute);
@@ -41,20 +46,23 @@ app.route("/webhooks", webhookRoute);
 //   return c.json(res);
 // });
 
-const start = async () =>{
+const start = async () => {
   try {
-    serve({
-  fetch: app.fetch,
-  port: 8003
-}, (info) => {
-  console.log(`Payment Service is running on port ${info.port}...`)
-})
+    Promise.all([await producer.connect(), await consumer.connect()]);
+    await runKafkaSubscreptions();
+    serve(
+      {
+        fetch: app.fetch,
+        port: 8003,
+      },
+      (info) => {
+        console.log(`Payment Service is running on port ${info.port}...`);
+      }
+    );
   } catch (error) {
     console.log(error);
     process.exit(1);
   }
-}
+};
 
 start();
-
-
