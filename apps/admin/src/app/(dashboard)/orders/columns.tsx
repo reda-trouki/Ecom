@@ -96,6 +96,7 @@ export const columns: ColumnDef<OrderType>[] = [
     },
   },
   {
+    
     id: "actions",
     cell: ({ row }) => {
       const order = row.original;

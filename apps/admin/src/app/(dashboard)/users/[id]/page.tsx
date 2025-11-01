@@ -28,7 +28,7 @@ const getData = async (id: string): Promise<User | null> => {
   const token = await getToken();
 
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_Auth_SERVICE_URL}/users/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/users/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }

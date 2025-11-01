@@ -2,12 +2,12 @@ import { auth, User } from "@clerk/nextjs/server";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
 
-const getData = async (): Promise<{data:User[], totalCount:number}> => {
+const getData = async (): Promise<{ data: User[], totalCount: number }> => {
   const { getToken } = await auth();
   const token = await getToken();
 
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_Auth_SERVICE_URL}/users`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/users`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -16,12 +16,13 @@ const getData = async (): Promise<{data:User[], totalCount:number}> => {
     return data;
   } catch (error) {
     console.log(error);
-    return {data:[], totalCount: 0}
+    return { data: [], totalCount: 0 }
   }
 };
 
 const UsersPage = async () => {
   const res = await getData();
+
   return (
     <div className="">
       <div className="mb-8 px-4 py-2 bg-secondary rounded-md">

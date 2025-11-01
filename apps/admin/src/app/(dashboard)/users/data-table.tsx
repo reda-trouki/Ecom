@@ -21,6 +21,11 @@ import {
 import { DataTablePagination } from "@/components/TablePagination";
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
+import { toast } from "react-toastify";
+import { useAuth } from "@clerk/nextjs";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { User } from "@clerk/nextjs/server";
+import { useRouter } from "next/navigation";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -33,6 +38,32 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({});
+  const router = useRouter();
+
+  const { getToken } = useAuth();
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const token = await getToken();
+      const selectedRows = table.getSelectedRowModel().rows;
+      Promise.all(selectedRows.map(async (row) => {
+        const userId = (row.original as User).id;
+        const res = await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/users/${userId}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+        });
+      }))
+    },
+    onSuccess: () => {
+      toast.success("User(s) deleted successfuly")
+      router.refresh();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    }
+  });
 
   const table = useReactTable({
     data,
@@ -48,13 +79,18 @@ export function DataTable<TData, TValue>({
     },
   });
 
+
   return (
     <div className="rounded-md border">
       {Object.keys(rowSelection).length > 0 && (
         <div className="flex justify-end">
-          <button className="flex items-center gap-2 bg-red-500 text-white px-2 py-1 text-sm rounded-md m-4 cursor-pointer">
-            <Trash2 className="w-4 h-4"/>
-            Delete User(s)
+          <button
+            className="flex items-center gap-2 bg-red-500 text-white px-2 py-1 text-sm rounded-md m-4 cursor-pointer"
+            onClick={() => mutation.mutate()}
+            disabled={mutation.isPending}
+          >
+            <Trash2 className="w-4 h-4" />
+            {mutation.isPending ? "Deleting" : "Delete User(s)"}
           </button>
         </div>
       )}
@@ -68,9 +104,9 @@ export function DataTable<TData, TValue>({
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
                   </TableHead>
                 );
               })}
