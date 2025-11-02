@@ -3,6 +3,7 @@ import express, { NextFunction, Request, Response } from "express";
 import { shouldBeAdmin } from "./middleware/authMiddleware";
 import userRoute from "./routes/user.route";
 import { clerkMiddleware } from "@clerk/express";
+import { producer } from "./utils/kafka";
 
 const app = express();
 
@@ -37,7 +38,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 
 const start = async () => {
   try {
-    // Promise.all([await producer.connect(), await consumer.connect()]);
+    await producer.connect();
     app.listen(8004, () => {
       console.log("Auth Service Is Running on port 8004");
     });
