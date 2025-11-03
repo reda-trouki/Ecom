@@ -164,9 +164,9 @@ This project follows a **microservices architecture** pattern with the following
 ![Order Management](./docs/images/admin/orders.png)
 *Order tracking and management system*
 
-#### Analytics & Reports
+<!-- #### Analytics & Reports
 ![Analytics](./docs/images/admin/analytics.png)
-*Detailed analytics and reporting dashboard*
+*Detailed analytics and reporting dashboard* -->
 
 ## 🚀 Getting Started
 

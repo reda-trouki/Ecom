@@ -40,6 +40,7 @@ import AddOrder from "./AddOrder";
 import AddUser from "./AddUser";
 import AddCategory from "./AddCategory";
 import AddProduct from "./AddProduct";
+import { auth, currentUser } from "@clerk/nextjs/server";
 
 const items = [
   {
@@ -69,7 +70,8 @@ const items = [
   },
 ];
 
-const AppSidebar = () => {
+const AppSidebar = async () => {
+  const user = await currentUser();
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="py-4">
@@ -77,8 +79,8 @@ const AppSidebar = () => {
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link href="/">
-                <Image src="/logo.svg" alt="logo" width={20} height={20} />
-                <span>Lama Dev</span>
+                <Image src="/logo.png" alt="logo" width={20} height={20} />
+                <span>{user?.firstName} {user?.lastName}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

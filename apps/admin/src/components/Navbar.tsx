@@ -14,6 +14,7 @@ import {
 import { Button } from "./ui/button";
 import { useTheme } from "next-themes";
 import { SidebarTrigger, useSidebar } from "./ui/sidebar";
+import { UserButton } from "@clerk/nextjs";
 
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
@@ -50,7 +51,7 @@ const Navbar = () => {
           </DropdownMenuContent>
         </DropdownMenu>
         {/* USER MENU */}
-        <DropdownMenu>
+        {/* <DropdownMenu>
           <DropdownMenuTrigger>
             <Avatar>
               <AvatarImage src="https://avatars.githubusercontent.com/u/1486366" />
@@ -73,7 +74,8 @@ const Navbar = () => {
               Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu> */}
+        <UserButton />
       </div>
     </nav>
   );
