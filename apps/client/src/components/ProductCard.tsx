@@ -2,7 +2,7 @@
 
 import useCartStore from "@/stores/cartStore";
 import { ProductType } from "@repo/types";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Heart, Eye } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -13,6 +13,7 @@ const ProductCard = ({ product }: { product: ProductType }) => {
     size: product.sizes[0]!,
     color: product.colors[0]!,
   });
+  const [isHovered, setIsHovered] = useState(false);
 
   const { addToCart } = useCartStore();
 
@@ -36,77 +37,142 @@ const ProductCard = ({ product }: { product: ProductType }) => {
       selectedSize: productTypes.size!,
       selectedColor: productTypes.color!,
     });
-    toast.success("Product added to cart")
+    toast.success("Product added to cart!");
   };
 
   return (
-    <div className="shadow-lg rounded-lg overflow-hidden">
-      {/* IMAGE */}
-      <Link href={`/products/${product.id}`}>
-        <div className="relative aspect-[2/3]">
+    <div
+      className="group bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100 hover:border-gray-200"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* IMAGE CONTAINER */}
+      <div className="relative aspect-[3/4] overflow-hidden bg-gray-50">
+        <Link href={`/products/${product.id}`}>
           <Image
             src={(product.images as Record<string, string>)[productTypes.color] || ""}
             alt={product.name}
             fill
-            className="object-cover hover:scale-105 transition-all duration-300"
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
-        </div>
-      </Link>
-      {/* PRODUCT DETAIL */}
-      <div className="flex flex-col gap-4 p-4">
-        <h1 className="font-medium">{product.name}</h1>
-        <p className="text-sm text-gray-500">{product.shortDescription}</p>
-        {/* PRODUCT TYPES */}
-        <div className="flex items-center gap-4 text-xs">
-          {/* SIZES */}
-          <div className="flex flex-col gap-1">
-            <span className="text-gray-500">Size</span>
-            <select
-              name="size"
-              id="size"
-              className="ring ring-gray-300 rounded-md px-2 py-1"
-              onChange={(e) =>
-                handleProductType({ type: "size", value: e.target.value })
-              }
+        </Link>
+
+        {/* OVERLAY ACTIONS */}
+        <div className={`absolute inset-0 bg-black/20 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'
+          }`}>
+          <div className="absolute top-4 right-4 flex flex-col gap-2">
+            <button
+              className="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-md hover:bg-white transition-all duration-200 group/btn"
+              aria-label="Add to wishlist"
+              title="Add to wishlist"
             >
-              {product.sizes.map((size) => (
-                <option key={size} value={size}>
-                  {size.toUpperCase()}
-                </option>
-              ))}
-            </select>
+              <Heart className="w-4 h-4 text-gray-600 group-hover/btn:text-red-500" />
+            </button>
+            <Link
+              href={`/products/${product.id}`}
+              className="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-md hover:bg-white transition-all duration-200 group/btn"
+              aria-label="View product details"
+              title="View product details"
+            >
+              <Eye className="w-4 h-4 text-gray-600 group-hover/btn:text-indigo-500" />
+            </Link>
           </div>
+        </div>
+
+        {/* QUICK ADD TO CART */}
+        <div className={`absolute bottom-4 left-4 right-4 transform transition-all duration-300 ${isHovered ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+          }`}>
+          <button
+            onClick={handleAddToCart}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2 shadow-lg"
+          >
+            <ShoppingCart className="w-4 h-4" />
+            Quick Add
+          </button>
+        </div>
+      </div>
+
+      {/* PRODUCT DETAILS */}
+      <div className="p-5">
+        {/* PRODUCT NAME & DESCRIPTION */}
+        <div className="mb-4">
+          <Link href={`/products/${product.id}`}>
+            <h3 className="font-semibold text-gray-900 hover:text-indigo-600 transition-colors duration-200 line-clamp-2">
+              {product.name}
+            </h3>
+          </Link>
+          <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+            {product.shortDescription}
+          </p>
+        </div>
+
+        {/* PRICE */}
+        <div className="mb-4">
+          <span className="text-xl font-bold text-gray-900">
+            ${product.price.toFixed(2)}
+          </span>
+        </div>
+
+        {/* PRODUCT OPTIONS */}
+        <div className="space-y-4">
           {/* COLORS */}
-          <div className="flex flex-col gap-1">
-            <span className="text-gray-500">Color</span>
+          <div>
+            <span className="text-xs font-medium text-gray-700 mb-2 block">
+              Color
+            </span>
             <div className="flex items-center gap-2">
               {product.colors.map((color) => (
-                <div
-                  className={`cursor-pointer border-1 ${
-                    productTypes.color === color
-                      ? "border-gray-400"
-                      : "border-gray-200"
-                  } rounded-full p-[1.2px]`}
+                <button
                   key={color}
-                  onClick={() =>
-                    handleProductType({ type: "color", value: color })
-                  }
+                  onClick={() => handleProductType({ type: "color", value: color })}
+                  className={`w-6 h-6 rounded-full border-2 transition-all duration-200 ${productTypes.color === color
+                      ? "border-indigo-500 scale-110 shadow-md"
+                      : "border-gray-200 hover:border-gray-300"
+                    } ${color === 'white' ? 'bg-white' :
+                      color === 'black' ? 'bg-black' :
+                        color === 'gray' ? 'bg-gray-500' :
+                          color === 'blue' ? 'bg-blue-500' :
+                            color === 'red' ? 'bg-red-500' :
+                              color === 'green' ? 'bg-green-500' :
+                                color === 'yellow' ? 'bg-yellow-500' :
+                                  color === 'purple' ? 'bg-purple-500' :
+                                    color === 'pink' ? 'bg-pink-500' :
+                                      color === 'orange' ? 'bg-orange-500' :
+                                        'bg-gray-400'}`}
+                  title={color}
+                  aria-label={`Select ${color} color`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* SIZES */}
+          <div>
+            <span className="text-xs font-medium text-gray-700 mb-2 block">
+              Size
+            </span>
+            <div className="flex items-center gap-2 flex-wrap">
+              {product.sizes.map((size) => (
+                <button
+                  key={size}
+                  onClick={() => handleProductType({ type: "size", value: size })}
+                  className={`px-3 py-1 text-xs font-medium rounded-md border transition-all duration-200 ${productTypes.size === size
+                      ? "bg-indigo-600 text-white border-indigo-600"
+                      : "bg-white text-gray-700 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                    }`}
                 >
-                  <div
-                    className="w-[14px] h-[14px] rounded-full"
-                    style={{ backgroundColor: color }}
-                  />
-                </div>
+                  {size.toUpperCase()}
+                </button>
               ))}
             </div>
           </div>
         </div>
-        {/* PRICE AND ADD TO CART BUTTON */}
-        <div className="flex items-center justify-between">
-          <p className="font-medium">${product.price.toFixed(2)}</p>
+
+        {/* ADD TO CART BUTTON (Desktop Fallback) */}
+        <div className="mt-5 lg:block hidden">
           <button
             onClick={handleAddToCart}
-            className="ring-1 ring-gray-200 shadow-lg rounded-md px-2 py-1 text-sm cursor-pointer hover:text-white hover:bg-black transition-all duration-300 flex items-center gap-2"
+            className="w-full bg-gray-900 hover:bg-indigo-600 text-white py-2.5 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2"
           >
             <ShoppingCart className="w-4 h-4" />
             Add to Cart
