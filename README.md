@@ -469,6 +469,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-For support, email reda.trouki@example.com or create an issue in this repository.
+For support, email trouki.reda@gmail.com or create an issue in this repository.
 
 **Happy Coding! 🚀**
